@@ -22,5 +22,5 @@ citation_resource = CitationResource()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(citation_resource.urls)),
+    url(r'^api/', include(citation_resource.urls)),
 ]

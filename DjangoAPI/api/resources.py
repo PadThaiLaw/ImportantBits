@@ -4,9 +4,9 @@ from api.models import Decision, Citation, Paragraph
 
 class CitationResource(ModelResource):
     class Meta:
-        object_list = Decision.objects.filter(canlii_id = "2001scc2")
-        queryset = Citation.objects.all()
-        resource_name = 'Citation'
+        # object_list = Decision.objects.filter(canlii_id = "2001scc2")
+        queryset = Paragraph.objects.all()
+        resource_name = 'citation'
 
 # # Create your models here.
 
