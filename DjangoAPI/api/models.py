@@ -21,7 +21,7 @@ class Paragraph(models.Model):
     citation_id = models.ForeignKey(Citation, on_delete = models.PROTECT)
     cited_paragraph = models.PositiveIntegerField()
     citing_paragraph = models.PositiveIntegerField()
-    sentiment_score = models.FloatField()
+    sentiment_score = models.DecimalField(decimal_places=10, max_digits=12)
 
     def __str__(self):
-        return self.cited_paragraph
+        return self.citation_id.cited_case_id.name + " " + self.citation_id.citing_case_id.name + " " + str(self.cited_paragraph)

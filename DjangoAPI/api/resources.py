@@ -2,10 +2,11 @@ from tastypie.resources import ModelResource
 from api.models import Decision, Citation, Paragraph
 
 
-class DecisionResource(ModelResource):
+class CitationResource(ModelResource):
     class Meta:
-        queryset = Note.objects.all()
-        resource_name = 'note'
+        object_list = Decision.objects.filter(canlii_id = "2001scc2")
+        queryset = Citation.objects.all()
+        resource_name = 'Citation'
 
 # # Create your models here.
 
