@@ -12,9 +12,11 @@ import os
 #   d determine sentiment
 #   e put into DB
 
-# CanLII constants
+# starting point CanLII params
 CASEID = "2007fca198"
-CANLII_CASE_DATABASE="csc-scc/"
+CANLII_CASE_DATABASE="fca/"
+
+# CanLII constants
 CANLII_BASE_URL = "http://api.canlii.org/v1/"
 CANLII_CITATOR = "caseCitator/"
 CANLII_BROWSE = "caseBrowse/"
