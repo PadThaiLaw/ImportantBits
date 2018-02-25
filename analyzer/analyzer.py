@@ -17,10 +17,18 @@ CASEID = "2007fca198"
 CANLII_CASE_DATABASE="csc-scc/"
 CANLII_BASE_URL = "http://api.canlii.org/v1/"
 CANLII_CITATOR = "caseCitator/"
+CANLII_BROWSE = "caseBrowse/"
 CANLII_LANGUAGE= "en/"
 
 # global variables - BAD
-citing_cases = []
+citing_cases = [] # CitingCase
+
+class CitingCase:
+
+  def __init__(self):
+    self.caseId = ""
+    self.databaseId = ""
+    self.url = ""
 
 class CanLIIConnection:
 
@@ -34,8 +42,24 @@ class CanLIIConnection:
     array = body['citingCases']
 
     for item in array:
-      citing_cases.append(item['caseId']['en'])
+      self.build_citing_case(item)
       # print(item['caseId']['en'])
+
+  def build_citing_case(self, case_object):
+    url = CANLII_BASE_URL + CANLII_BROWSE + CANLII_LANGUAGE
+    url += case_object['databaseId'] + "/" + case_object['caseId']['en']
+    url += "?api_key=" + CANLII_API_KEY
+
+    r = requests.get(url)
+    body = json.loads(r.text)
+    case_url = body['url']
+
+    tmp = CitingCase()
+    tmp.caseId = case_object['caseId']['en']
+    tmp.databaseId = case_object['databaseId']
+    tmp.url = case_url
+    citing_cases.append(tmp)
+    print("Queuing: " + tmp.caseId + " at " + tmp.url)
 
 # get environment variables
 CANLII_API_KEY = os.environ['CANLII_KEY']
