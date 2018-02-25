@@ -29,6 +29,7 @@ class CitingCase:
 
   def __init__(self):
     self.caseId = ""
+    self.truncated_title = ""
     self.databaseId = ""
     self.url = ""
 
@@ -55,13 +56,15 @@ class CanLIIConnection:
     r = requests.get(url)
     body = json.loads(r.text)
     case_url = body['url']
+    truncated_title = body['title'].split()[0]
 
     tmp = CitingCase()
     tmp.caseId = case_object['caseId']['en']
+    tmp.truncated_title = truncated_title
     tmp.databaseId = case_object['databaseId']
     tmp.url = case_url
     citing_cases.append(tmp)
-    print("Queuing: " + tmp.caseId + " at " + tmp.url)
+    print("Queuing: " + tmp.truncated_title + " (" + tmp.caseId + ")" + " at " + tmp.url)
 
 # get environment variables
 CANLII_API_KEY = os.environ['CANLII_KEY']
