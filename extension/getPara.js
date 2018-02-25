@@ -35,7 +35,7 @@ function getParaByIndex(index){
 
 function highlightParagraph(index, color, opacity){
   var paraElement = getParaByIndex(index);
-  paraElement.innerHTML = "<mark style='background-color: " + color + "; opacity: " + opacity + ";'>" + paraElement.innerHTML + "</mark>"
+  paraElement.innerHTML = "<mark id=" + color + " style='background-color: " + color + "; opacity: " + opacity + ";'>" + paraElement.innerHTML + "</mark>"
 }
 
 var APIURL = "https://importantbits.pythonanywhere.com/api/citation/?canlii_id="
