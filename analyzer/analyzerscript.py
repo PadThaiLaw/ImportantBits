@@ -5,10 +5,12 @@ import urllib.request
 import requests
 import json
 import os
+import re
 
 # starting point CanLII params
 CASEID = "2017fca8"
 CANLII_CASE_DATABASE="fca/"
+TRUNCATED_NAME = "Pharma"
 
 # CanLII constants
 CANLII_BASE_URL = "http://api.canlii.org/v1/"
@@ -109,10 +111,19 @@ def tag_visible(element):
 def sentiment_analysis(text):
     return -0.5
 
-def find_paragraphs(text):
-    if "para" in text:
-        return [13, 23]
-    else:
+def find_paragraphs(casename, text):
+    output = []
+    re_to_try = []
+    # re_to_try.append(re.compile("Thamotharem.*para[s|.| ]*([0-9]+)-([0-9]+)")) # group(1) && group(2)
+    re_to_try.append(re.compile(casename+".*para[s|.| ]*([0-9]+)"))
+    re_to_try.append(re.compile(casename+".*paragraphs* +([0-9]+)"))
+
+    for attempt in re_to_try:
+        result = attempt.search(text)
+        if (result != None) and result.group(1):
+            output.append(result.group(1))
+            return output
+
         return None
 
 # Process ONE webpage
@@ -122,7 +133,8 @@ def process_html(url):
     texts = soup.findAll(text=True)
     visible_texts = filter(tag_visible, texts)
     for t in visible_texts:
-        paragraph_list = find_paragraphs(t)
+        print(t)
+        paragraph_list = find_paragraphs(TRUNCATED_NAME, t)
         if paragraph_list:
             sentiment_score = sentiment_analysis(t)
             for para in paragraph_list:

@@ -14,17 +14,18 @@ str = """[39]                          To achieve this purpose, Board hearings t
 
 It is fundamental to the idea of justice that adjudicators, whether in administrative tribunals or courts, strive to ensure that similar cases receive the same treatment. This point was made eloquently by Gonthier J. when writing for the majority in IWA v. Consolidated‑Bathurst Packaging Ltd., 1990 CanLII 132 (SCC), 1990] 1 S.C.R. 282, at page 327 (Consolidated‑Bathurst) . . . " """
 
-def find_paragraphs(text):
+
+def find_paragraphs(casename, text):
   re_to_try = []
   # re_to_try.append(re.compile("Thamotharem.*para[s|.| ]*([0-9]+)-([0-9]+)")) # group(1) && group(2)
-  re_to_try.append(re.compile("Thamotharem.*para[s|.| ]*([0-9]+)"))
-  re_to_try.append(re.compile("Thamotharem.*paragraphs* +([0-9]+)"))
+  re_to_try.append(re.compile(casename+".*para[s|.| ]*([0-9]+)"))
+  re_to_try.append(re.compile(casename+".*paragraphs* +([0-9]+)"))
 
   for attempt in re_to_try:
     result = attempt.search(text)
-    if result.group(1):
+    if (result != None) and result.group(1):
       return result.group(1)
 
     return None
 
-find_paragraphs(str)
+print(find_paragraphs("Thamotharem", str))
