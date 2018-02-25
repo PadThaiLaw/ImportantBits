@@ -45,3 +45,27 @@ cc = CanLIIConnection()
 cc.citing_cases()
 
 # run next query
+
+
+
+class APIModel:
+    def __init__(self, canlii_id_str, paragraph_num_int, citation_count_int, sentiment_sum_int):
+        self.canlii_id = canlii_id_str
+        self.paragraph_num = paragraph_num_int
+        self.citation_count = citation_count_int
+        self.sentiment_sum = sentiment_sum_int
+    def post(self):
+        content = {
+                "canlii_id": self.canlii_id,
+                "citation_count": self.citation_count,
+                "paragraph_num": self.paragraph_num,
+                "sentiment_sum": self.sentiment_sum
+            }
+        request = requests.post("http://importantbits.pythonanywhere.com/api/citation/", json=content)
+    def increment_count(self):
+        self.citation_count += 1
+    def set_sentiment(self, new_sentiment):
+        self.sentiment = new_sentiment
+    def print(self):
+        printstring = self.canlii_id + " at paragraph " + str(self.paragraph_num) + ", cited " +str(self.citation_count) + " times and has sentiment score of " + str(self.sentiment_sum)
+        print(printstring)
