@@ -6,7 +6,23 @@ import requests
 import json
 import os
 
+# starting point CanLII params
+CASEID = "2017fca8"
+CANLII_CASE_DATABASE="fca/"
+
+# CanLII constants
+CANLII_BASE_URL = "http://api.canlii.org/v1/"
+CANLII_CITATOR = "caseCitator/"
+CANLII_BROWSE = "caseBrowse/"
+CANLII_LANGUAGE= "en/"
+
+# get environment variables
+# TODO: CANLII_API_KEY = os.environ['CANLII_KEY']
+CANLII_API_KEY = "eefjh7g5zneqw33662t5wunu"
+
 # GLOBAL VARIABLES
+# List of CitingCase objects of all cases that cite
+citing_cases = []
 # Format, list of a list [[23,0.5], [25,0.6], [23,-1]]
 aggregate_data = []
 # Format, list of APIModel objects
@@ -41,10 +57,48 @@ class APIModel:
         printstring = self.canlii_id + " at paragraph " + str(self.paragraph_num) + ", cited " +str(self.citation_count) + " times and has sentiment score of " + str(self.sentiment_sum)
         print(printstring)
 
-# HELPER FUNCTIONS
-def return_html(canlii_id):
-    return "https://www.canlii.org/en/ca/scc/doc/2001/2001scc2/2001scc2.html"
+class CitingCase:
 
+  def __init__(self):
+    self.caseId = ""
+    self.truncated_title = ""
+    self.databaseId = ""
+    self.url = ""
+
+class CanLIIConnection:
+
+  def citing_cases(self):
+    url = CANLII_BASE_URL + CANLII_CITATOR + CANLII_LANGUAGE
+    url += CANLII_CASE_DATABASE + CASEID + "/citingCases"
+    url += "?api_key=" + CANLII_API_KEY
+
+    r = requests.get(url)
+    body = json.loads(r.text)
+    array = body['citingCases']
+
+    for item in array:
+      self.build_citing_case(item)
+      # print(item['caseId']['en'])
+
+  def build_citing_case(self, case_object):
+    url = CANLII_BASE_URL + CANLII_BROWSE + CANLII_LANGUAGE
+    url += case_object['databaseId'] + "/" + case_object['caseId']['en']
+    url += "?api_key=" + CANLII_API_KEY
+
+    r = requests.get(url)
+    body = json.loads(r.text)
+    case_url = body['url']
+    truncated_title = body['title'].split()[0]
+
+    tmp = CitingCase()
+    tmp.caseId = case_object['caseId']['en']
+    tmp.truncated_title = truncated_title
+    tmp.databaseId = case_object['databaseId']
+    tmp.url = case_url
+    citing_cases.append(tmp)
+    print("Queuing: " + tmp.truncated_title + " (" + tmp.caseId + ")" + " at " + tmp.url)
+
+# HELPER FUNCTIONS
 def tag_visible(element):
     if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
         return False
@@ -77,8 +131,8 @@ def process_html(url):
 # Loop over list of webpages
 def loop_over_htmls(list_of_html):
     for html in list_of_html:
+        print("Currently parsing " + html)
         process_html(html)
-
 
 # POST PROCESSING
 # Sort and combine aggregate data list
@@ -117,4 +171,16 @@ def process_aggregate_data(local_agg_data, canlii_id):
 
 # RUN TIME CODE:
 
-def run_script("")
+def run_script():
+    # Getting a URL List to iterate through
+    cc = CanLIIConnection()
+    cc.citing_cases()
+    url_list = []
+    for case in citing_cases:
+        url_list.append(case.url)
+    # Loop over HTMLs
+    loop_over_htmls(url_list)
+    # Process aggregate data which will post to website
+    process_aggregate_data(aggregate_data, CASEID)
+    
+run_script()
