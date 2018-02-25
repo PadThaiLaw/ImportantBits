@@ -1,5 +1,5 @@
 from tastypie import fields
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from api.models import Decision, Citation, Paragraph
 
 class DecisionResource(ModelResource):
@@ -7,29 +7,42 @@ class DecisionResource(ModelResource):
         # object_list = Decision.objects.filter(canlii_id = "2001scc2")
         queryset = Decision.objects.all()
         resource_name = 'decision'
-        
+        filtering = {
+            'canlii_id' : ALL
+        }
+
+# http://127.0.0.1:8000/api/paragraph/citation__decision__id=1
 
 class CitationResource(ModelResource):
-    cited_case_id = fields.ForeignKey(DecisionResource, 'cited_case_id')
+    # cited_case_id = fields.ForeignKey(DecisionResource, 'cited_case_id')
     class Meta:
         # object_list = Decision.objects.filter(canlii_id = "2001scc2")
         queryset = Citation.objects.all()
         resource_name = 'citation'
+        filtering = {
+            'cited_case_id' : ALL_WITH_RELATIONS
+        }
+
 
 class ParagraphResource(ModelResource):
     citation_id = fields.ForeignKey(CitationResource, 'citation_id')
     sentscore = fields.DecimalField(readonly=True)
     class Meta:
         # object_list = Decision.objects.filter(canlii_id = "2001scc2")
-        input_canlii_id = '2001scc2'
-        queryset = Paragraph.objects.all().filter(citation_id = Citation.objects.all().filter(cited_case_id = Decision.objects.get(canlii_id = input_canlii_id)))
+        # input_canlii_id = '2001scc2'
+        queryset = Paragraph.objects.all()
+        # queryset = Paragraph.objects.all().filter(citation_id = Citation.objects.all().filter(cited_case_id = Decision.objects.get(canlii_id = input_canlii_id)))
         resource_name = 'paragraph'
 
-        def dehydrate_sentscore(self, bundle):
-                average_score = 0.0
-                for para in bundle.obj.sentiment_score.all():
-                    average_score = 10000.000
-                return average_score
+        filtering = {
+            'cited_paragraph' : ALL_WITH_RELATIONS
+        }
+
+        # def dehydrate_sentscore(self, bundle):
+        #         average_score = 0.0
+        #         for para in bundle.obj.sentiment_score.all():
+        #             average_score = 10000.000
+        #         return average_score
 
 
         # choose field names to include
