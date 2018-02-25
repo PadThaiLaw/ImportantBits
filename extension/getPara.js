@@ -44,11 +44,11 @@ $(document).ready(function() {
 function queryServer(NeutralCitation){
     $.ajax({
     //url: APIURL + NeutralCitation,
-    url: "https://olympics.cbc.ca/",
+    url: "http://127.0.0.1:8000/api/citation/?canlii_id=2001scc2",
     type: 'GET',
     success: function(response) {
       //CHRIS'S CODE//
-      response = '{"objects": [{"citation_count": 5, "paragraph_num": 33, "sentiment_sum": 5}, {"citation_count": 2, "paragraph_num": 48, "sentiment_sum": -2}]}'
+      // response = '{"objects": [{"citation_count": 5, "paragraph_num": 33, "sentiment_sum": 5}, {"citation_count": 2, "paragraph_num": 48, "sentiment_sum": -2}]}'
       responseHandler(response);
       
       console.log("Sending GET REQUEST")
@@ -60,7 +60,8 @@ function queryServer(NeutralCitation){
 }
 
 function responseHandler(response){
-  var paras = JSON.parse(response).objects;
+  console.log(response)
+  var paras = response.objects;
   var paragraph;
   for (var i = 0; i < paras.length; i++) {
     paragraph = paras[i];
