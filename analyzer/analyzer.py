@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import requests
+import json
 import os
 
 # 1 get citation information from canlii for cited case
@@ -11,20 +12,22 @@ import os
 #   d determine sentiment
 #   e put into DB
 
-CASEID = "2001scc2"
+CASEID = "2007fca198"
 CANLII_CASE_DATABASE="csc-scc/"
 CANLII_BASE_URL = "http://api.canlii.org/v1/"
 CANLII_CITATOR = "caseCitator/"
 CANLII_LANGUAGE= "en/"
 
-def citing_cases():
-  url = CANLII_BASE_URL + CANLII_CITATOR + CANLII_LANGUAGE
-  url += CANLII_CASE_DATABASE + CASEID + "/citingCases"
-  url += "?api_key=" + CANLII_API_KEY
+class CanLIIConnection:
 
-  r = requests.get(url)
-  print(r.headers)
+  def citing_cases(self):
+    url = CANLII_BASE_URL + CANLII_CITATOR + CANLII_LANGUAGE
+    url += CANLII_CASE_DATABASE + CASEID + "/citingCases"
+    url += "?api_key=" + CANLII_API_KEY
+
+    r = requests.get(url)
 
 CANLII_API_KEY = os.environ['CANLII_KEY']
 
-citing_cases()
+cc = CanLIIConnection()
+cc.citing_cases()
