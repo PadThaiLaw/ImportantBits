@@ -19,7 +19,7 @@ $( document ).ready(function() {
 		GlobalParas.push(element);
 	}
 	console.log(GlobalParas.length)
-	highlightParagraph(getParaByIndex(36), "rgba(255,0,0,.15)", 1)
+	highlightParagraph(getParaByIndex(3), "rgba(255,0,0,.15)", 1)
 });
 
 function getParaByIndex(index){
