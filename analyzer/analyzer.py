@@ -12,11 +12,15 @@ import os
 #   d determine sentiment
 #   e put into DB
 
+# CanLII constants
 CASEID = "2007fca198"
 CANLII_CASE_DATABASE="csc-scc/"
 CANLII_BASE_URL = "http://api.canlii.org/v1/"
 CANLII_CITATOR = "caseCitator/"
 CANLII_LANGUAGE= "en/"
+
+# global variables - BAD
+citing_cases = []
 
 class CanLIIConnection:
 
@@ -26,8 +30,18 @@ class CanLIIConnection:
     url += "?api_key=" + CANLII_API_KEY
 
     r = requests.get(url)
+    body = json.loads(r.text)
+    array = body['citingCases']
 
+    for item in array:
+      citing_cases.append(item['caseId']['en'])
+      # print(item['caseId']['en'])
+
+# get environment variables
 CANLII_API_KEY = os.environ['CANLII_KEY']
 
+# run CanLII query
 cc = CanLIIConnection()
 cc.citing_cases()
+
+# run next query
