@@ -22,8 +22,12 @@ $( document ).ready(function() {
   }
   console.log(GlobalParas.length);
   //highlightParagraph(getParaByIndex(3), "rgba(255,0,0,.15)", 1)
-  queryServer("2001scc2");
+  queryServer(getNeutralCitation());
 });
+
+function getNeutralCitation(){
+	return window.location.pathname.match("([0-9]+[a-z]+[0-9]+).html")[1];
+}
 
 function getParaByIndex(index){
   return GlobalParas[index - 1];
