@@ -1,11 +1,19 @@
+# IMPORTS
 from bs4 import BeautifulSoup
 from bs4.element import Comment
 import urllib.request
 import requests
 
-# FIRST STAGE - API call to Canlii, get a list of url's to scrape
+# GLOBAL VARIABLES
+# Format, list of a list [[23,0.5], [25,0.6], [23,-1]]
+aggregate_data = []
+# Format, list of APIModel objects
+citations_list = []
 
-# SECOND STAGE - preparing html to more readable text
+# Helper Functions
+def return_html(canlii_id):
+    return "https://www.canlii.org/en/ca/scc/doc/2001/2001scc2/2001scc2.html"
+
 def tag_visible(element):
     if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
         return False
@@ -13,20 +21,76 @@ def tag_visible(element):
         return False
     return True
 
-# CORE RUNNING CODE - this will iterate through the current text
-def text_from_html(body):
+def sentiment_analysis(text):
+    return -0.5
+
+def find_paragraphs(text):
+    if "para" in text:
+        return [13, 23]
+    else:
+        return None
+
+# Process ONE webpage
+def process_html(url):
+    body = urllib.request.urlopen(url).read()
     soup = BeautifulSoup(body, 'html.parser')
     texts = soup.findAll(text=True)
     visible_texts = filter(tag_visible, texts)
     for t in visible_texts:
-        print(t)
-    return u" ".join(t.strip() for t in visible_texts)
+        paragraph_list = find_paragraphs(t)
+        if paragraph_list:
+            sentiment_score = sentiment_analysis(t)
+            for para in paragraph_list:
+                aggregate_data.append([para, sentiment_score])
 
-# FUN FUNCTIONS
-# Find paragraphs
-# Derive sentiment score
+process_html("https://www.canlii.org/en/ca/scc/doc/2001/2001scc2/2001scc2.html")
 
-# html = urllib.request.urlopen('https://www.canlii.org/en/ca/scc/doc/2001/2001scc2/2001scc2.html').read()
+# Loop over list of webpages
+def loop_over_htmls(list_of_html):
+    for html in list_of_html:
+        process_html(html)
+
+
+# POST PROCESSING
+# Sort and combine aggregate data list
+def process_aggregate_data(local_agg_data, canlii_id):
+    # Input format, list of a list [[23,0.5], [25,0.6], [23,-1]]
+    local_agg_data.sort(key=lambda x: x[0]) # Sorts the list of list based on value at index[0]
+    # Initialize parameters
+    current_paragraph = None
+    current_count = 0
+    current_sentiment_score = 0
+    # Parameters for counting, to action at the final pair of data
+    index = 0
+    length_agg_data = len(local_agg_data)
+
+    # Loop over each pair in a sorted list, if they are the same paragraph, increment count and add sentiments, otherwise save to model list
+    for pair in local_agg_data:
+        index += 1
+        if pair[0] != current_paragraph:
+            if (current_count != 0) or (index==length_agg_data):
+                print([current_paragraph, current_count, current_sentiment_score])
+                # TODO Save as model to model list
+                # citations_list.append(APIModel(canlii_id, current_paragraph, current_count, current_sentiment_score))
+            current_paragraph = pair[0]
+            current_count = 1
+            current_sentiment_score = pair[1]
+        else:
+            current_count += 1
+            # TODO: Determine what our algorithm is
+            current_sentiment_score = current_sentiment_score + pair[1]
+        # Catches the last paragraph that will not switch
+        if index==length_agg_data:
+            print([current_paragraph, current_count, current_sentiment_score])
+            # TODO Save as model to model list
+            # citations_list.append(APIModel(canlii_id, current_paragraph, current_count, current_sentiment_score))
+
+
+
+
+
+
+
 
 
 CANLII_KEY = "eefjh7g5zneqw33662t5wunu"
@@ -115,9 +179,9 @@ class DjangoModel:
         print(printstring)
 
 
-scc = DjangoModel("2001abca23", 33, 25, 5)
-scc.post()
-scc.print()
+# scc = DjangoModel("2001abca23", 33, 25, 5)
+# scc.post()
+# scc.print()
 
 def citing_cases(self):
     url = CANLII_BASE_URL + CANLII_CITATOR + CANLII_LANGUAGE
