@@ -59,6 +59,7 @@ function queryServer(NeutralCitation){
 
 function responseHandler(response){
 	console.log(response)
+
   var paras = response.objects;
   var paragraph;
   for (var i = 0; i < paras.length; i++) {
