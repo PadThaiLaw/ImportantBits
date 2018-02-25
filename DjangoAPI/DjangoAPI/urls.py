@@ -1,4 +1,4 @@
-"""DjangoAPIv2 URL Configuration
+"""DjangoAPI URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.11/topics/http/urls/
@@ -15,15 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from api.resources import DecisionResource, CitationResource, ParagraphResource
-from tastypie.api import Api
+from api.resources import CitationResource
 
-v1_api = Api(api_name="v1")
-v1_api.register(DecisionResource())
-v1_api.register(CitationResource())
-v1_api.register(ParagraphResource())
+citation_resource = CitationResource()
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include(v1_api.urls)),
+    url(r'^api/', include(citation_resource.urls)),
 ]
