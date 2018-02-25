@@ -5,7 +5,7 @@ var GlobalParas = [];
 
 // Puts all the paragraphs into a data structure
 $( document ).ready(function() {
-  console.log("1")
+  console.log("Storing all the paras")
   var ParArray = $("a[name*='par']")
   for (var i = 0; i < ParArray.length; i++) {
     var element = $(ParArray[i]).parent()[0];
@@ -22,7 +22,7 @@ $( document ).ready(function() {
   }
   console.log(GlobalParas.length);
   //highlightParagraph(getParaByIndex(3), "rgba(255,0,0,.15)", 1)
-  queryServer();
+  queryServer("2001scc2");
 });
 
 function getParaByIndex(index){
@@ -34,7 +34,7 @@ function highlightParagraph(index, color, opacity){
   paraElement.innerHTML = "<mark style='background-color: " + color + "; opacity: " + opacity + ";'>" + paraElement.innerHTML + "</mark>"
 }
 
-var APIURL = "/api/citation/?canlii_id="
+var APIURL = "https://importantbits.pythonanywhere.com/api/citation/?canlii_id="
 
 $(document).ready(function() {
   $('#checkPage').click(function(){queryServer()});
@@ -43,12 +43,10 @@ $(document).ready(function() {
 
 function queryServer(NeutralCitation){
     $.ajax({
-    //url: APIURL + NeutralCitation,
-    url: "https://olympics.cbc.ca/",
+    url: APIURL + NeutralCitation,
     type: 'GET',
     success: function(response) {
       //CHRIS'S CODE//
-      response = '{"objects": [{"citation_count": 5, "paragraph_num": 33, "sentiment_sum": 5}, {"citation_count": 2, "paragraph_num": 48, "sentiment_sum": -2}]}'
       responseHandler(response);
       
       console.log("Sending GET REQUEST")
@@ -60,7 +58,8 @@ function queryServer(NeutralCitation){
 }
 
 function responseHandler(response){
-  var paras = JSON.parse(response).objects;
+	console.log(response)
+  var paras = response.objects;
   var paragraph;
   for (var i = 0; i < paras.length; i++) {
     paragraph = paras[i];

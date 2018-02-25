@@ -21,6 +21,6 @@
   "permissions": [
     "activeTab",
     "storage",
-    "http://*/"
+    "<all_urls>"
   ]
 }
