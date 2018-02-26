@@ -34,7 +34,7 @@ function getParaByIndex(index){
 
 function highlightParagraph(index, color, opacity){
 	if(index > GlobalParas.length || index < 1) {return;} // trash bad paragraph numbers
-	opacity = opacity/100;
+	opacity = opacity/10;
   var paraElement = getParaByIndex(index);
   var rgbcolor = "white";
   if(color == "red"){
