@@ -271,7 +271,7 @@ function xivmap(config) {
 		if (!rectangle.width || !rectangle.height) return '';
 		var style = 'style="' +
 			'position: absolute; ' +
-			'background-color: ' + color + ';' +
+			 color + ';' +
 			'top: ' + r(rectangle.top * ratio) + 'px; ' +
 			'left: ' + r(rectangle.left * ratio) + 'px; ' +
 			'width: ' + r(rectangle.width * ratio) + 'px; ' +
@@ -293,18 +293,25 @@ function xivmap(config) {
 	 * @returns {string}
 	 */
 	function makeAccurateRectangle(element, ratio) {
-		var red = element.querySelector("#red") != null
-		var green = element.querySelector("#green") != null
+		console.log("making rectangle for minimap")
+		
+		var red = element.id == "red"
+		var green = element.id == "green"
 		var html = '';
 		var range = document.createRange();
 		range.selectNodeContents(element)
 		var rects = range.getClientRects();
 		var color;
 		if(red){
-			color = "red";
+			console.log(element)
+			console.log("it's red")
+			color = element.getAttribute("style");
+			console.log(color)
 		}
 		if(green){
-			color = "green";
+			console.log(element)
+			console.log("it's green")
+			color = element.getAttribute("style");
 		}
 		if (rects.length) {
 			for (var i = 0; i < rects.length; i++) {
