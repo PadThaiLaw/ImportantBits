@@ -26,20 +26,21 @@ def sentiment_analysis(para):
     #      sentiment=True,
     #      limit=2)))
 
-    obj = json.dumps(response)
-    sentiment = faking_sentiment(str(obj))
+    sentiment = faking_sentiment(response)
     # print(json.dumps(response, indent=2))
-    # return response[‘entities’][0][‘emotions’][‘anger’]
+    return sentiment
 
 def faking_sentiment(json_object):
-    print(json_object)
     array = json_object['entities']
     anger = 0
+    joy = 0
+    sadness = 0
 
     for item in array:
         anger += item['emotion']['anger']
+        joy += item['emotion']['joy']
+        sadness += item['emotion']['sadness']
 
-    return anger
-
+    return joy - (anger + sadness)
 
 sentiment_analysis(text)
