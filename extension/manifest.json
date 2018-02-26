@@ -11,7 +11,8 @@
   "content_scripts": [
     {
       "matches" : ["*://www.canlii.org/*"],
-      "js": ["jquery.js", "getPara.js"]
+      "css" : ["xivmap.css"],
+      "js": ["jquery.js", "xivmap.js", "getPara.js"]
     }
   ],
   "browser_action": {

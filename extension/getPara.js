@@ -21,7 +21,6 @@ $( document ).ready(function() {
     GlobalParas.push(element);
   }
   console.log(GlobalParas.length);
-  //highlightParagraph(getParaByIndex(3), "rgba(255,0,0,.15)", 1)
   queryServer(getNeutralCitation());
 });
 
@@ -34,8 +33,21 @@ function getParaByIndex(index){
 }
 
 function highlightParagraph(index, color, opacity){
+	//console.log("highlighting para: " + index);
+	opacity = opacity/100;
   var paraElement = getParaByIndex(index);
-  paraElement.innerHTML = "<mark style='background-color: " + color + "; opacity: " + opacity + ";'>" + paraElement.innerHTML + "</mark>"
+  var rgbcolor = "white";
+  if(color == "red"){
+  	rgbcolor = "rgba(255,0,0," + opacity + ");"
+  }
+  if(color == "green"){
+  	rgbcolor = "rgba(0,255,0," + opacity + ");"
+  }
+  //console.log(index + " " + color + " "+ rgbcolor + " "+ opacity)
+  //console.log(paraElement)
+  paraElement.setAttribute("style", "background:"+rgbcolor);
+  paraElement.id = color;
+  //paraElement.innerHTML = "<mark id=" + color + " style='background: " + color + "; opacity: " + opacity/100 + ";'>" + paraElement.innerHTML + "</mark>"
 }
 
 var APIURL = "https://importantbits.pythonanywhere.com/api/citation/?canlii_id="
@@ -52,8 +64,6 @@ function queryServer(NeutralCitation){
     success: function(response) {
       //CHRIS'S CODE//
       responseHandler(response);
-      
-      console.log("Sending GET REQUEST")
     },
     error: function() {
       console.log("There was an error processing your request. Please try again.")
@@ -66,10 +76,17 @@ function responseHandler(response){
 
   var paras = response.objects;
   var paragraph;
+  var color;
   for (var i = 0; i < paras.length; i++) {
     paragraph = paras[i];
     console.log(paragraph)
-    highlightParagraph(paragraph.paragraph_num, "red", 1);
+    if(paragraph.sentiment_sum == -1){
+    	color = "red";
+    }
+    else{
+    	color = "green";
+    }
+    highlightParagraph(paragraph.paragraph_num, color, paragraph.citation_count);
   }
 }
 
