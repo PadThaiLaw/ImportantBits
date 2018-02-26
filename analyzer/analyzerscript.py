@@ -8,9 +8,9 @@ import os
 import re
 
 # starting point CanLII params
-CASEID = "2017fca8"
+CASEID = "2017fca37"
 CANLII_CASE_DATABASE="fca/"
-TRUNCATED_NAME = "Pharma"
+TRUNCATED_NAME = "Sikes"
 
 # CanLII constants
 CANLII_BASE_URL = "http://api.canlii.org/v1/"
@@ -41,6 +41,10 @@ class APIModel:
         self.sentiment_sum = sentiment_sum_int
     # Function to post to database
     def post(self):
+        if self.sentiment_sum > 0:
+            self.sentiment_sum = 1
+        else:
+            self.sentiment_sum = -1
         content = {
             "canlii_id": self.canlii_id,
             "citation_count": self.citation_count,
@@ -49,8 +53,8 @@ class APIModel:
         }
         request = requests.post("http://importantbits.pythonanywhere.com/api/citation/", json=content)
     # Function to increment by 1
-    def increment_count(self):
-        self.citation_count += 1
+    def set_count(self, new_count):
+        self.citation_count = new_count
     # Function to set sentiment
     def set_sentiment(self, new_sentiment):
         self.sentiment = new_sentiment
@@ -130,10 +134,13 @@ def find_paragraphs(casename, text):
 def process_html(url):
     body = urllib.request.urlopen(url).read()
     soup = BeautifulSoup(body, 'html.parser')
-    texts = soup.findAll(text=True)
-    visible_texts = filter(tag_visible, texts)
-    for t in visible_texts:
-        print(t)
+    texts = soup.getText()
+    words = texts.split()
+    subs = []
+    n = 120
+    for i in range(0, len(words), n):
+        subs.append(" ".join(words[i:i+n]))
+    for t in subs:
         paragraph_list = find_paragraphs(TRUNCATED_NAME, t)
         if paragraph_list:
             sentiment_score = sentiment_analysis(t)
@@ -165,8 +172,8 @@ def process_aggregate_data(local_agg_data, canlii_id):
         if pair[0] != current_paragraph:
             if (current_count != 0) or (index==length_agg_data):
                 print([current_paragraph, current_count, current_sentiment_score])
-                # TODO Save as model to model list
-                # citations_list.append(APIModel(canlii_id, current_paragraph, current_count, current_sentiment_score))
+                if current_paragraph != None:
+                    citations_list.append(APIModel(canlii_id, current_paragraph, current_count, current_sentiment_score))
             current_paragraph = pair[0]
             current_count = 1
             current_sentiment_score = pair[1]
@@ -177,8 +184,8 @@ def process_aggregate_data(local_agg_data, canlii_id):
         # Catches the last paragraph that will not switch
         if index==length_agg_data:
             print([current_paragraph, current_count, current_sentiment_score])
-            # TODO Save as model to model list
-            # citations_list.append(APIModel(canlii_id, current_paragraph, current_count, current_sentiment_score))
+            if current_paragraph != None:
+                citations_list.append(APIModel(canlii_id, current_paragraph, current_count, current_sentiment_score))
 
 
 # RUN TIME CODE:
@@ -194,5 +201,11 @@ def run_script():
     loop_over_htmls(url_list)
     # Process aggregate data which will post to website
     process_aggregate_data(aggregate_data, CASEID)
+    sum_of_count = 0
+    for citation in citations_list:
+        sum_of_count = sum_of_count + citation.citation_count
+    for citation in citations_list:
+        citation.set_count(int(citation.citation_count/sum_of_count*100))
+        citation.post()
     
 run_script()
