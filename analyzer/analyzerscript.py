@@ -6,11 +6,19 @@ import requests
 import json
 import os
 import re
+from watson_developer_cloud import NaturalLanguageUnderstandingV1
+from watson_developer_cloud.natural_language_understanding_v1 \
+    import Features, EntitiesOptions
+
+natural_language_understanding = NaturalLanguageUnderstandingV1(
+    username='7a315258-8e4f-47b1-baf8-c587bd8dd55e',
+    password='eipuaSHlINpN',
+    version='2017-02-27')
 
 # starting point CanLII params
-CASEID = "2017fca37"
+CASEID = "2007fca198"
 CANLII_CASE_DATABASE="fca/"
-TRUNCATED_NAME = "Sikes"
+TRUNCATED_NAME = "Thamotharem"
 
 # CanLII constants
 CANLII_BASE_URL = "http://api.canlii.org/v1/"
@@ -105,6 +113,21 @@ class CanLIIConnection:
     print("Queuing: " + tmp.truncated_title + " (" + tmp.caseId + ")" + " at " + tmp.url)
 
 # HELPER FUNCTIONS
+
+def faking_sentiment(json_object):
+    array = json_object['entities']
+    anger = 0
+    joy = 0
+    sadness = 0
+
+    for item in array:
+        anger += item['emotion']['anger']
+        joy += item['emotion']['joy']
+        sadness += item['emotion']['sadness']
+
+    return joy - (anger + sadness)
+
+    
 def tag_visible(element):
     if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
         return False
@@ -112,8 +135,22 @@ def tag_visible(element):
         return False
     return True
 
-def sentiment_analysis(text):
-    return -0.5
+def sentiment_analysis(para):
+    response = natural_language_understanding.analyze(
+        text=para,
+        features=Features(entities=EntitiesOptions(
+            emotion=True,
+            sentiment=True,
+            limit=2),
+            keywords=None))
+    #    keywords=KeywordsOptions(
+    #      emotion=True,
+    #      sentiment=True,
+    #      limit=2)))
+
+    sentiment = faking_sentiment(response)
+    # print(json.dumps(response, indent=2))
+    return sentiment
 
 def find_paragraphs(casename, text):
     output = []
