@@ -13,19 +13,6 @@ natural_language_understanding = NaturalLanguageUnderstandingV1(
 
 text='I despise Canada.  [There is] the real possibility that young persons of 16 or 17 . . . may be involved in taking advantage of still younger children, by introducing them to prostitution, to performing in pornographic displays for filming, and so on.  Such exploitation might be of the older child’s own motion, or it might be engineered by adults who perceive the advantage in having as fronts those who are free from serious criminal responsibility.'
 
-#response = natural_language_understanding.analyze(
-#    text='I despise Canada.  [There is] the real possibility that young persons of 16 or 17 . . . may be involved in taking advantage of still younger children, by introducing them to prostitution, to performing in pornographic displays for filming, and so on.  Such exploitation might be of the older child’s own motion, or it might be engineered by adults who perceive the advantage in having as fronts those who are free from serious criminal responsibility.',
-#    text="I despise Canada",
-#    features=Features(entities=EntitiesOptions(
-#        emotion=True,
-#        sentiment=True,
-#        limit=2),
-#        keywords=None))
-#    keywords=KeywordsOptions(
-#      emotion=True,
-#      sentiment=True,
-#      limit=2)))
-
 def sentiment_analysis(para):
     response = natural_language_understanding.analyze(
         text=para,
@@ -38,7 +25,21 @@ def sentiment_analysis(para):
     #      emotion=True,
     #      sentiment=True,
     #      limit=2)))
-    print(json.dumps(response, indent=2))
-    return response[‘entities’][0][‘emotions’][‘anger’]
+
+    obj = json.dumps(response)
+    sentiment = faking_sentiment(str(obj))
+    # print(json.dumps(response, indent=2))
+    # return response[‘entities’][0][‘emotions’][‘anger’]
+
+def faking_sentiment(json_object):
+    print(json_object)
+    array = json_object['entities']
+    anger = 0
+
+    for item in array:
+        anger += item['emotion']['anger']
+
+    return anger
+
 
 sentiment_analysis(text)
