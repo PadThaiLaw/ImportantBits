@@ -33,7 +33,7 @@ function getParaByIndex(index){
 }
 
 function highlightParagraph(index, color, opacity){
-	//console.log("highlighting para: " + index);
+	if(index > GlobalParas.length || index < 1) {return;} // trash bad paragraph numbers
 	opacity = opacity/100;
   var paraElement = getParaByIndex(index);
   var rgbcolor = "white";
@@ -43,11 +43,8 @@ function highlightParagraph(index, color, opacity){
   if(color == "green"){
   	rgbcolor = "rgba(0,255,0," + opacity + ");"
   }
-  //console.log(index + " " + color + " "+ rgbcolor + " "+ opacity)
-  //console.log(paraElement)
   paraElement.setAttribute("style", "background:"+rgbcolor);
   paraElement.id = color;
-  //paraElement.innerHTML = "<mark id=" + color + " style='background: " + color + "; opacity: " + opacity/100 + ";'>" + paraElement.innerHTML + "</mark>"
 }
 
 var APIURL = "https://importantbits.pythonanywhere.com/api/citation/?canlii_id="
