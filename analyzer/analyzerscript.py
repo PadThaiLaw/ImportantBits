@@ -15,10 +15,16 @@ natural_language_understanding = NaturalLanguageUnderstandingV1(
     password='eipuaSHlINpN',
     version='2017-02-27')
 
+# # starting point CanLII params
+# CASEID = "2007fca198"
+# CANLII_CASE_DATABASE="fca/"
+# TRUNCATED_NAME = "Thamotharem"
+
 # starting point CanLII params
-CASEID = "2007fca198"
+# SMALLER CASE WITH ONLY 3 CITING DOCUMENTS
+CASEID = "2017fca2"
 CANLII_CASE_DATABASE="fca/"
-TRUNCATED_NAME = "Thamotharem"
+TRUNCATED_NAME = "Turner"
 
 # CanLII constants
 CANLII_BASE_URL = "http://api.canlii.org/v1/"
@@ -48,6 +54,7 @@ class APIModel:
         self.citation_count = citation_count_int
         self.sentiment_sum = sentiment_sum_int
     # Function to post to database
+    # TODO: Backend password glh2018!
     def post(self):
         if self.sentiment_sum > 0:
             self.sentiment_sum = 1
@@ -88,6 +95,7 @@ class CanLIIConnection:
 
     r = requests.get(url)
     body = json.loads(r.text)
+    # TODO: Error appears when there is only 1 case, passes a string instead of an array
     array = body['citingCases']
 
     for item in array:
@@ -113,8 +121,8 @@ class CanLIIConnection:
     print("Queuing: " + tmp.truncated_title + " (" + tmp.caseId + ")" + " at " + tmp.url)
 
 # HELPER FUNCTIONS
-
 def faking_sentiment(json_object):
+    # TODO: Currently, overly negative, very tough to get a positive result
     array = json_object['entities']
     anger = 0
     joy = 0
@@ -169,20 +177,37 @@ def find_paragraphs(casename, text):
 
 # Process ONE webpage
 def process_html(url):
-    body = urllib.request.urlopen(url).read()
-    soup = BeautifulSoup(body, 'html.parser')
-    texts = soup.getText()
-    words = texts.split()
-    subs = []
-    n = 120
-    for i in range(0, len(words), n):
-        subs.append(" ".join(words[i:i+n]))
-    for t in subs:
-        paragraph_list = find_paragraphs(TRUNCATED_NAME, t)
+    body = requests.get(url)
+    soup = BeautifulSoup(body.content, 'html.parser')
+    separated_text = soup.find_all('p') 
+    # BeautifulSoup finds all paragraphs and splits into separate strings in a list
+    # For each string, run through to search for paragraph numbers (find_paragraphs())
+    # Then if there is a paragraph, run through Watson (sentiment_analysis())  
+    # Finally, append to the global aggregate_data variable 
+    for text in separated_text:
+        text = text.get_text().replace('\n', '')
+        paragraph_list = find_paragraphs(TRUNCATED_NAME, text)
         if paragraph_list:
-            sentiment_score = sentiment_analysis(t)
-            for para in paragraph_list:
-                aggregate_data.append([para, sentiment_score])
+            sentiment_score = sentiment_analysis(text)
+            for paragraph in paragraph_list:
+                aggregate_data.append([paragraph, sentiment_score])
+
+# OLD method to process one webpage, truncates text into 120 word paragraphs
+# def process_html_OLD(url):
+#     body = urllib.request.urlopen(url).read()
+#     soup = BeautifulSoup(body, 'html.parser')
+#     texts = soup.getText()
+#     words = texts.split()
+#     subs = []
+#     n = 120
+#     for i in range(0, len(words), n):
+#         subs.append(" ".join(words[i:i+n]))
+#     for t in subs:
+#         paragraph_list = find_paragraphs(TRUNCATED_NAME, t)
+#         if paragraph_list:
+#             sentiment_score = sentiment_analysis(t)
+#             for para in paragraph_list:
+#                 aggregate_data.append([para, sentiment_score])
 
 # Loop over list of webpages
 def loop_over_htmls(list_of_html):

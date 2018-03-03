@@ -77,9 +77,11 @@ function responseHandler(response){
   var paras = response.objects;
   var paragraph;
   var color;
+  console.log(paras.length)
   for (var i = 0; i < paras.length; i++) {
     paragraph = paras[i];
     console.log(paragraph)
+    // TODO: Catch an error here which breaks all subsequent paragraphs
     if(paragraph.sentiment_sum == -1){
     	color = "red";
     }
