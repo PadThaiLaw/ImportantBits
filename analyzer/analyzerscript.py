@@ -45,7 +45,7 @@ aggregate_data = []
 citations_list = []
 
 # CLASSES
-# Class to track what to post onto the database
+# Class model to reply DjangoAPI, ability to post to website
 class APIModel:
     # Initialize by calling APIModel(canliiIDString, paragraph number, citation count and sentiment int), APIModel("2002bcca12, 33, 0, 0")
     def __init__(self, canlii_id_str, paragraph_num_int, citation_count_int, sentiment_sum_int):
@@ -79,7 +79,6 @@ class APIModel:
         print(printstring)
 
 class CitingCase:
-
   def __init__(self):
     self.caseId = ""
     self.truncated_title = ""
@@ -87,7 +86,6 @@ class CitingCase:
     self.url = ""
 
 class CanLIIConnection:
-
   def citing_cases(self):
     url = CANLII_BASE_URL + CANLII_CITATOR + CANLII_LANGUAGE
     url += CANLII_CASE_DATABASE + CASEID + "/citingCases"
@@ -251,7 +249,7 @@ def process_aggregate_data(local_agg_data, canlii_id):
 
 
 # RUN TIME CODE:
-
+# To change cases, look at constants at the top of this code
 def run_script():
     # Getting a URL List to iterate through
     cc = CanLIIConnection()
